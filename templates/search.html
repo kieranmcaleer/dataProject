@@ -4,28 +4,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockSentiment</title>
-   
-</head>
-<body>
-    <form action = "/"  method= "POST">
-        <input type="text" name="search" placeholder="Search a Stock or Ticker">
-        <script>
-            $( function() {
-              var availableTags = [
-                  {% for language in languages %}
-                      "{{language}}",
-                  {% endfor %}
-              ];
-              $( "#tags" ).autocomplete({
-                source: availableTags
-              });
-            } );
-            </script>
-        <input value= "submit" type="submit">
-    </div>
-    {{ query }}
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">  
     </script>  
     
@@ -34,5 +12,28 @@
     
     <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css"
         rel="stylesheet" type="text/css" />  
+    <title>StockSentiment</title>
+   
+</head>
+<body>
+    <form action = "/"  method= "POST">
+        <input type="text" name="search" placeholder="Search a Stock or Ticker">
+        <script>
+        $( function() {
+            var availableTags = [
+                {% for stock in stocks_with_ticker %}
+                    "{{stock}}",
+                {% endfor %}
+            ];
+            $( "input[name='search']" ).autocomplete({
+                source: availableTags
+            });
+        });
+        </script>
+        <input value= "submit" type="submit">
+    </div>
+    {{ query }}
+
+
 </body>
 </html>
