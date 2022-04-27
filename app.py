@@ -3,6 +3,8 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 import urllib3
+import re
+import nltk
 
 app = Flask(__name__)
 
@@ -20,18 +22,23 @@ def getHTMLdocument(url):
 def search():
     nyse_df = pd.read_csv("constituents_csv.csv")
     stock_list = nyse_df.values.tolist()
-    stocks_with_ticker = [pair[1] + " " +
-                          '(' + pair[0] + ')' for pair in stock_list]
+    stocks_with_ticker = [pair[1] + " " + '(' + pair[0] + ')'
+                          for pair in stock_list]
 
-    query = request.form.get("search")
-    URL = "https://news.google.com/search?q=" + str(query) + " when%3A1d&hl"
+    query = str(request.form.get("search"))
+    if query != None:
+        new_query = re.findall('[^()]+', query)
+    URL = "https://news.google.com/search?q=" + \
+        str(new_query) + " when%3A1d&hl"
     html_document = getHTMLdocument(URL)
     soup = BeautifulSoup(html_document, 'html.parser')
     titles = soup.find_all("a", class_="DY5T1d RZIKme")
     link_titles = [link.getText() for link in titles]
-    return render_template("search.html", query=link_titles, stocks_with_ticker=stocks_with_ticker)
+    all_titles = []
+    all_titles.extend(link_titles)
+
+    return render_template("search.html", new_query=new_query, stocks_with_ticker=stocks_with_ticker, link_titles=link_titles, all_titles=all_titles)
 
 
 if __name__ == "__main__":
-    from waitress import serve
-    serve(app, host="0.0.0.0", port=8080)
+    app.run(debug=True)
